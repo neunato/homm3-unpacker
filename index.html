@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" type="text/css" href="index.css">   
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <script src="homm3-unpacker.js"></script>
+   <script src="vue.min.js"></script>
+
+   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-91559453-2"></script>
+   <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-91559453-2');</script>
+</head>
+
+<body>
+
+
+<script>
+   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#window.onerror
+   // For some reason, error is undefined in IE, but message is "Syntax error".
+   window.onerror = function( message ){
+      if( message === "Syntax error" ){
+         document.body.innerHTML = '<main class="message"><p>Sorry, browser not supported</p></main>'
+         if( window.stop )
+            window.stop()
+         else
+            document.execCommand("Stop")    // IE.
+      }
+   }
+</script>
+
+
+<main id="root" class="message"><p>Loading...</p></div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+"use strict"
+
+
+const { unpackLOD, unpackDEF, unpackPCX } = window["homm3-unpacker"]
+
+
+
+Vue.component("app-main-txt", {
+   template:
+     `<main class="txt" ref="main" @scroll="scrollTop = $event.target.scrollTop">
+         <p>{{ text }}</p>
+      </main>`,
+
+   props: ["file"],
+
+   data: () => ({
+      scrollTop: 0
+   }),
+
+   computed: {
+      text(){
+         // Split into chunks due to number of parameters limit.
+         const bytes = new Uint8Array(this.file)
+         let result = ""
+         for( let i = 0; i < bytes.length; i += 8192 )
+            result += String.fromCharCode(...bytes.slice(i, i + 8192))
+         return result
+      }
+   },
+
+   activated(){
+      this.$refs.main.scrollTop = this.scrollTop
+   }
+})
+
+Vue.component("app-main-lod", {
+   template:
+     `<main class="lod" ref="main" @scroll="scrollTop = $event.target.scrollTop">
+         <ol><li v-for="(child, name) of file.files" @click="$emit('add-file', name, child)">{{ name }}</li></ol>
+      </main>`,
+
+   props: ["file"],
+
+   data: () => ({
+      scrollTop: 0
+   }),
+
+   activated(){
+      this.$refs.main.scrollTop = this.scrollTop
+   }
+})
+
+Vue.component("app-main-def", {
+   template:
+      `<main class="def">
+         <dl class="def-groups" ref="nav" @scroll="scrollTop = $event.target.scrollTop">
+            <template v-for="(group, name) of file.groups">
+               <dt :class="{ selected: selected === group }" @click="selected = group">
+                  {{ name }}<span class="toggle" @click.stop="collapsed[name] = !collapsed[name]">{{ collapsed[name] ? "&#x2795;" : "  &#x2796;" }}</span>
+               </dt>
+               <dd v-show="!collapsed[name]">
+                  <ol><li v-for="filename of group" :class="{ selected: selected === filename }" @click="selected = filename">{{ filename }}</li></ol>
+               </dd>
+            </template>
+         </dl>
+      <app-canvas :activeFrames="activeFrames" :box="box"></app-canvas>
+      </main>`,
+
+   props: ["file"],
+
+   data: ({ file }) => ({
+      selected: file.groups[Object.keys(file.groups)[0]],       // Select first group.
+      collapsed: Object.keys(file.groups).reduce((r, n) => { r[n] = true; return r }, {}),
+      scrollTop: 0
+   }),
+
+   computed: {
+      activeFrames(){
+         if( !this.selected )
+            return null
+
+         const images = this.file.images
+         if( typeof this.selected === "string" )
+            return [images[this.selected]]
+         else
+            return this.selected.map(name => images[name])
+      },
+
+      // Drawing "box" for centering; all images considered.
+      box(){
+         let top = Infinity, left = Infinity, bottom = 0, right = 0
+
+         const names = Object.keys(this.file.images)
+         for( const name of names ){
+            const image = this.file.images[name]
+            if( image.y < top )
+               top = image.y
+            if( image.y + image.height > bottom )
+               bottom = image.y + image.height
+            if( image.x < left )
+               left = image.x
+            if( image.x + image.width > right )
+               right = image.x + image.width
+         }
+
+         return {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top
+         }
+      }
+   },
+
+   activated(){
+      this.$refs.nav.scrollTop = this.scrollTop
+   }
+})
+
+Vue.component("app-main-pcx", {
+   template:
+     `<main class="pcx">
+         <app-canvas :activeFrames="[file]" :box="box"></app-canvas>
+      </main>`,
+
+   props: ["file"],
+
+   computed: {
+      box(){
+         return {
+            x: 0,
+            y: 0,
+            width: this.file.width,
+            height: this.file.height
+         }
+      }
+   }
+})
+
+Vue.component("app-main-message", {
+   template: `<main class="message"><p>{{ message }}</p></main>`,
+   props: ["message"]
+})
+
+Vue.component("app-canvas", {
+   template: 
+     `<section class="canvas">
+         <canvas ref="canvas"></canvas>
+         <span class="scale">{{ scale }}x</span>
+      </section>`,
+
+   props: ["box", "activeFrames"],
+
+   data: () => ({
+      context: null,
+      width: null,
+      height: null,
+      running: null,
+      scale: 2,                // Square pixels per .pcx pixel.
+      fpaf: 8,                 // Frames per animation frame.
+      image: null              // Currently drawn frame.
+   }),
+
+   computed: {
+      maxScale(){
+         return Math.floor( Math.min(this.width / (this.box.width + 2), this.height / (this.box.height + 2)) )
+      }
+   },
+
+   watch: {
+      activeFrames(){ this.start() },
+   },
+
+   activated(){  
+      this.start()
+   },
+
+   deactivated(){
+      this.stop()
+   },
+
+   mounted(){
+      const canvas = this.$refs.canvas
+      this.context = canvas.getContext("2d")
+
+      window.addEventListener("resize", () => {
+         if( !this.image )
+            return
+
+         this.width = canvas.width = canvas.clientWidth
+         this.height = canvas.height = canvas.clientHeight
+         this.rescale(this.scale)         
+         this.draw(this.image)
+      })
+
+      canvas.addEventListener("wheel", (e) => {
+         if( e.deltaY < 0 )
+            this.rescale(this.scale + 1)
+         else
+            this.rescale(this.scale - 1)
+      })
+   },
+
+   methods: {
+      start(){
+         // Stop previous animation.
+         this.stop()
+
+         const canvas = this.context.canvas
+         this.width = canvas.width = canvas.clientWidth
+         this.height = canvas.height = canvas.clientHeight
+         this.rescale(this.scale)
+
+         // Start drawing (single image or animation).
+         if( this.activeFrames.length === 1 )
+            this.draw(this.activeFrames[0])
+         else
+            this.animate(this.activeFrames)
+      },
+
+      stop(){
+         this.image = null
+         if( this.running ){
+            window.cancelAnimationFrame(this.running)
+            this.running = null
+         }
+      },
+
+      rescale( value ){
+         value = Math.max(1, Math.min(this.maxScale, value))
+         if( value === this.scale )
+            return
+         this.scale = value
+         this.draw(this.image)
+      },
+
+      animate( images, at = 0 ){
+         const fpaf = this.fpaf
+         if( at % fpaf === 0 ){
+            if( at / fpaf === images.length )
+               at = 0
+            this.draw(images[at / fpaf])
+         }
+
+         this.running = window.requestAnimationFrame( () => this.animate(images, at + 1) )
+      },
+
+      draw( image ){
+         if( !image )
+            return
+
+         this.clear()
+         this.image = image
+
+         const context = this.context
+         const box = this.box
+         const scale = this.scale
+
+         const rows = context.canvas.height / scale
+         const cols = context.canvas.width / scale
+         const row = Math.floor(rows / 2  -  box.height / 2  +  (image.y || 0) - box.y)
+         const col = Math.floor(cols / 2  -  box.width / 2  +  (image.x || 0) - box.x)
+         
+         const view = new Uint8Array(image.data)
+
+         let i = 0
+         while( i < view.byteLength ){
+            const r = view[i++]
+            const g = view[i++]
+            const b = view[i++]
+            const a = view[i++]
+            context.fillStyle = `rgba(${r},${g},${b},${a / 255})`
+            
+            const at = i / 4 - 1
+            const x = col + at % image.width
+            const y = row + Math.floor(at / image.width)
+            context.fillRect(x * scale, y * scale, scale, scale)
+         }
+      },
+
+      clear(){
+         const { width, height } = this.context.canvas
+         this.context.clearRect(0, 0, width, height)
+      }
+
+   }
+
+})
+
+const root = new Vue({
+
+   el: "#root",
+
+   template:
+     `<div id="root" :class="{ dragging }" @drop.prevent="onDrop($event)" @dragover.prevent @dragenter="dragCounter++" @dragleave="dragCounter--">
+
+         <nav v-if="tabs.length" id="tabs">
+            <ol ref="tabs" :style="{ left: tabsOffsetLeft + 'px' }">
+               <li v-for="tab of tabs" :class="{ active: tab === activeTab }" @click.stop="openTab(tab)" >{{ tab.name }}<span class="close" @click.stop="removeTab(tab)">&#x2716;</span></li>
+            </ol>
+
+            <div id="tabs-arrows">
+               <span v-show="tabs.length > 1" class="arrow left" @click.stop="openTabPrev"></span>
+               <span v-show="tabs.length > 1" class="arrow right" @click.stop="openTabNext"></span>
+            </div>
+          </nav>
+
+         <keep-alive>
+            <app-main-message v-if="loading" message="Loading..."></app-main-message>
+            <app-main-message v-else-if="!activeTab" message="Drop a game file"></app-main-message>
+            <app-main-message v-else-if="activeTab.message" :message="activeTab.message"></app-main-message>
+            <component v-else :is="'app-main-' + activeTab.type" :file="activeTab.file" @add-file="addTab(...arguments)" :key="activeTab.name"></component>
+         </keep-alive>
+
+      </div>`,
+
+   data: {
+      activeTab: null,
+      tabs: [],
+      loading: false,
+      dragCounter: 0,           // Used to detect file dragging.
+      tabsOffsetLeft: 0         // Used to keep active nav tab in view.
+   },
+
+   computed: {
+      dragging(){
+         return this.dragCounter > 0
+      }
+   },
+
+   methods: {
+      openTab( tab ){
+         this.activeTab = tab
+         this.scrollToTab()
+      },
+
+      scrollToTab(){
+         if( !this.activeTab )
+            return
+
+         // Wait for rendering.
+         Vue.nextTick(() => {
+
+            const tabs = this.$refs.tabs
+            const active = tabs.querySelector(".active")
+
+            // Tab overflowing left.
+            if( active.offsetLeft + this.tabsOffsetLeft < 0 ){
+               this.tabsOffsetLeft = 0
+               return
+            }
+
+            const fullWidth = tabs.clientWidth
+
+            // Tab overflowing right.
+            if( active.offsetLeft + active.offsetWidth > fullWidth ){
+               this.tabsOffsetLeft = -(active.offsetLeft + active.offsetWidth - fullWidth)
+               return
+            }
+            
+            // All tabs fit.
+            const last = tabs.querySelector("li:last-child")
+            if( last.offsetLeft + last.offsetWidth < fullWidth ){
+               this.tabsOffsetLeft = 0
+            }
+
+         })
+
+      },
+
+      openTabPrev(){
+         const i = this.tabs.indexOf(this.activeTab)
+         if( i - 1 >= 0 )
+            this.openTab(this.tabs[i - 1])
+      },
+
+      openTabNext(){
+         const i = this.tabs.indexOf(this.activeTab)
+         if( i + 1 < this.tabs.length )
+            this.openTab(this.tabs[i + 1])
+      },
+
+      addTab( name, buffer ){
+         const existing = this.tabs.find(tab => tab.name === name)
+         if( existing ){
+            this.openTab(existing)
+            return
+         }
+
+         let ext = name.match(/\.([^.]+)$/)
+         if( ext )
+            ext = ext[1].toLowerCase()
+
+         if( !["lod", "def", "pcx", "txt"].includes(ext) ){
+            const tab = { name, message: "Can't open that" }
+            this.tabs.push(tab)
+            this.openTab(tab)
+            return
+         }
+
+         let tab = { name, message: "Loading..." }
+         this.tabs.push(tab)
+         this.openTab(tab)
+
+         window.setTimeout(() => {
+            try{
+               if( ext === "lod" )
+                  tab.file = unpackLOD(buffer, { def: false, pcx: false })
+               else if( ext === "def" )
+                  tab.file = unpackDEF(buffer, { pcx: { format: "bitmap", padding: false } })
+               else if( ext === "pcx" )
+                  tab.file = unpackPCX(buffer, { format: "bitmap", padding: false })
+               else
+                  tab.file = buffer
+             
+               tab.type = ext
+               Vue.delete(tab, "message")  
+            }
+            catch(e){
+               tab.message = "Error parsing file"
+            }
+         })
+      },
+
+      removeTab( tab ){
+         const i = this.tabs.indexOf(tab)
+         this.tabs.splice(i, 1)
+
+         if( tab === this.activeTab )
+            this.openTab(this.tabs[i] || this.tabs[i - 1] || null)
+         else
+            this.scrollToTab()
+      }, 
+
+      onDrop( event ){
+         this.dragCounter = 0
+
+         const files = event.dataTransfer.files
+         for( const file of files ){
+            const reader = new FileReader()
+            reader.onload = (e) => this.addTab(file.name, e.target.result)
+            reader.readAsArrayBuffer(file)
+         }
+      }
+
+   },
+
+   mounted(){
+      window.addEventListener("resize", this.scrollToTab)
+      document.addEventListener("drop", e => e.preventDefault())
+   }
+
+})
+
+})
+
+</script>
+
+
+</body>
+</html>
+
+
