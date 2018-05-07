@@ -447,7 +447,7 @@ const root = new Vue({
                if( ext === "lod" )
                   tab.file = unpackLOD(buffer, { def: false, pcx: false })
                else if( ext === "def" )
-                  tab.file = unpackDEF(buffer, { pcx: { format: "bitmap", padding: false } })
+                  tab.file = unpackDEF(buffer, { format: "bitmap", padding: false })
                else if( ext === "pcx" )
                   tab.file = unpackPCX(buffer, { format: "bitmap", padding: false })
                else
