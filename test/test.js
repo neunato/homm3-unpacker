@@ -76,49 +76,39 @@ describe("def", function(){
          "stop moving":     ["cmummy66.pcx"]
       })
       assert(Object.keys(def.images), ["cmummy58.pcx","cmummy59.pcx","cmummy60.pcx","cmummy61.pcx","cmummy62.pcx","cmummy63.pcx","cmummy64.pcx","cmummy65.pcx","cmummy41.pcx","cmummy42.pcx","cmummy43.pcx","cmummy44.pcx","cmummy45.pcx","cmummy46.pcx","cmummy47.pcx","cmummy48.pcx","cmummy49.pcx","cmummy52.pcx","cmummy53.pcx","cmummy54.pcx","cmummy55.pcx","cmummy56.pcx","cmummy66.pcx","cmummy67.pcx","cmummy68.pcx","cmummy69.pcx","cmummy70.pcx","cmummy71.pcx","cmummy72.pcx","cmummy73.pcx","cmummy25.pcx","cmummy26.pcx","cmummy27.pcx","cmummy28.pcx","cmummy29.pcx","cmummy30.pcx","cmummy31.pcx","cmummy32.pcx","cmummy33.pcx","cmummy34.pcx","cmummy35.pcx","cmummy36.pcx","cmummy37.pcx","cmummy38.pcx","cmummy39.pcx","cmummy40.pcx","cmummy50.pcx","cmummy51.pcx","cmummy17.pcx","cmummy18.pcx","cmummy19.pcx","cmummy20.pcx","cmummy21.pcx","cmummy22.pcx","cmummy23.pcx","cmummy24.pcx","cmummy09.pcx","cmummy10.pcx","cmummy11.pcx","cmummy12.pcx","cmummy13.pcx","cmummy14.pcx","cmummy15.pcx","cmummy16.pcx","cmummy01.pcx","cmummy02.pcx","cmummy03.pcx","cmummy04.pcx","cmummy05.pcx","cmummy06.pcx","cmummy07.pcx","cmummy08.pcx","cmummy57.pcx"])
-      assert(def.images["cmummy01.pcx"], { type: "pcx (frame)", width: 58, height: 107, x: 170, y: 161, data: "1a9492ab5d7232ac8e2dcb14aaeef9f7f37a8ffe45c93310466c25a7b4798210" })
-      assert(def.images["cmummy41.pcx"], { type: "pcx (frame)", width: 44, height: 105, x: 174, y: 164, data: "0f26a16426438e89fad22b2852b49abaf1bcbf2529c0163fcf90647e1f233177", selection: "db3595a0a5a62810d1839e54755868249e9dd2f4b858565f4ef4f7808f1a20bf" })
-      assert(def.images["cmummy42.pcx"], { type: "pcx (frame)", width: 50, height: 112, x: 174, y: 157, data: "e4fdd056dbc149844ec15f0112a774f07647b714c3abb03fe2e0534adb116d6b", selection: "e5fddab6ee88c3c3676a91a729f5b18f8e10dc86ade34a5e535b93097fbda9e5" })
+      assert(def.images["cmummy01.pcx"], { width: 58, height: 107, x: 170, y: 161, data: "1a9492ab5d7232ac8e2dcb14aaeef9f7f37a8ffe45c93310466c25a7b4798210" })
+      assert(def.images["cmummy41.pcx"], { width: 44, height: 105, x: 174, y: 164, data: "0f26a16426438e89fad22b2852b49abaf1bcbf2529c0163fcf90647e1f233177", selection: "db3595a0a5a62810d1839e54755868249e9dd2f4b858565f4ef4f7808f1a20bf" })
+      assert(def.images["cmummy42.pcx"], { width: 50, height: 112, x: 174, y: 157, data: "e4fdd056dbc149844ec15f0112a774f07647b714c3abb03fe2e0534adb116d6b", selection: "e5fddab6ee88c3c3676a91a729f5b18f8e10dc86ade34a5e535b93097fbda9e5" })
    })
 
-   it("{ pcx: false }", function(){
-      const def = unpackDEF(files["Cmummy.def"], { pcx: false })
+   it("{ format: 'png', padding: false }", function(){
+      const def = unpackDEF(files["Cmummy.def"], { format: "png", padding: false })
       hashArrayBuffers(def)
 
       assert(def.type, "def (creature)")
-      assert(def.images["cmummy01.pcx"], "64f8f986539652c47b360f2b96493ee3e7744b4aaba747fb4cf3025e7a355e48")
-      assert(def.images["cmummy41.pcx"], "60c142c8be4a1c1b79100cdd81e24a6832c7010657aa93393633b78a4e69557e")
-      assert(def.images["cmummy42.pcx"], "e69ba645da108f680082df16e651fc1d1cc48f9d252b71c24acef92c713636c6")
+      assert(def.images["cmummy01.pcx"], { width: 58, height: 107, x: 170, y: 161, data: "1a9492ab5d7232ac8e2dcb14aaeef9f7f37a8ffe45c93310466c25a7b4798210" })
+      assert(def.images["cmummy41.pcx"], { width: 44, height: 105, x: 174, y: 164, data: "0f26a16426438e89fad22b2852b49abaf1bcbf2529c0163fcf90647e1f233177", selection: "db3595a0a5a62810d1839e54755868249e9dd2f4b858565f4ef4f7808f1a20bf" })
+      assert(def.images["cmummy42.pcx"], { width: 50, height: 112, x: 174, y: 157, data: "e4fdd056dbc149844ec15f0112a774f07647b714c3abb03fe2e0534adb116d6b", selection: "e5fddab6ee88c3c3676a91a729f5b18f8e10dc86ade34a5e535b93097fbda9e5" })
    })
 
-   it("{ pcx: { format: 'png', padding: false }}", function(){
-      const def = unpackDEF(files["Cmummy.def"], { pcx: { format: "png", padding: false } })
+   it("{ format: 'png', padding: true }", function(){
+      const def = unpackDEF(files["Cmummy.def"], { format: "png", padding: true })
       hashArrayBuffers(def)
 
       assert(def.type, "def (creature)")
-      assert(def.images["cmummy01.pcx"], { type: "pcx (frame)", width: 58, height: 107, x: 170, y: 161, data: "1a9492ab5d7232ac8e2dcb14aaeef9f7f37a8ffe45c93310466c25a7b4798210" })
-      assert(def.images["cmummy41.pcx"], { type: "pcx (frame)", width: 44, height: 105, x: 174, y: 164, data: "0f26a16426438e89fad22b2852b49abaf1bcbf2529c0163fcf90647e1f233177", selection: "db3595a0a5a62810d1839e54755868249e9dd2f4b858565f4ef4f7808f1a20bf" })
-      assert(def.images["cmummy42.pcx"], { type: "pcx (frame)", width: 50, height: 112, x: 174, y: 157, data: "e4fdd056dbc149844ec15f0112a774f07647b714c3abb03fe2e0534adb116d6b", selection: "e5fddab6ee88c3c3676a91a729f5b18f8e10dc86ade34a5e535b93097fbda9e5" })
+      assert(def.images["cmummy01.pcx"], { width: 58, height: 107, x: 170, y: 161, data: "9c23603da371629e2e91bf1afbd42f29c4dab9e22966f5916ac7e17fcdd0cb9d" })
+      assert(def.images["cmummy41.pcx"], { width: 44, height: 105, x: 174, y: 164, data: "78c70edc183a8977c29b41d333fac9f2e267df0c204d8540751bb1c2ac2178ad", selection: "164e2bc4a937c7252f02ededae4b2aa1425480d9e9ab71d03f3c4d09bdf7aa0e" })
+      assert(def.images["cmummy42.pcx"], { width: 50, height: 112, x: 174, y: 157, data: "880907f9bf0b706b29f206324519ae7f57dab79a24f77e3a7da2d9f6f05acc49", selection: "218a733a4ce1f1a19322654d0b61e693e2bc116621a39b425a7d6839a2ba7579" })
    })
 
-   it("{ pcx: { format: 'png', padding: true }}", function(){
-      const def = unpackDEF(files["Cmummy.def"], { pcx: { format: "png", padding: true } })
+   it("{ format: 'bitmap', padding: false }", function(){
+      const def = unpackDEF(files["Cmummy.def"], { format: "bitmap", padding: false })
       hashArrayBuffers(def)
 
       assert(def.type, "def (creature)")
-      assert(def.images["cmummy01.pcx"], { type: "pcx (frame)", width: 58, height: 107, x: 170, y: 161, data: "9c23603da371629e2e91bf1afbd42f29c4dab9e22966f5916ac7e17fcdd0cb9d" })
-      assert(def.images["cmummy41.pcx"], { type: "pcx (frame)", width: 44, height: 105, x: 174, y: 164, data: "78c70edc183a8977c29b41d333fac9f2e267df0c204d8540751bb1c2ac2178ad", selection: "164e2bc4a937c7252f02ededae4b2aa1425480d9e9ab71d03f3c4d09bdf7aa0e" })
-      assert(def.images["cmummy42.pcx"], { type: "pcx (frame)", width: 50, height: 112, x: 174, y: 157, data: "880907f9bf0b706b29f206324519ae7f57dab79a24f77e3a7da2d9f6f05acc49", selection: "218a733a4ce1f1a19322654d0b61e693e2bc116621a39b425a7d6839a2ba7579" })
-   })
-
-   it("{ pcx: { format: 'bitmap', padding: false }}", function(){
-      const def = unpackDEF(files["Cmummy.def"], { pcx: { format: "bitmap", padding: false } })
-      hashArrayBuffers(def)
-
-      assert(def.type, "def (creature)")
-      assert(def.images["cmummy01.pcx"], { type: "pcx (frame)", width: 58, height: 107, x: 170, y: 161, data: "8bfd518ff70b23a42d23b573802acaf4b8055ae361edd4171afd7c265fe7d8e9" })
-      assert(def.images["cmummy41.pcx"], { type: "pcx (frame)", width: 44, height: 105, x: 174, y: 164, data: "a341bf95e1876da8712682e634500c86bfa48b5d985bc7f1d2cbed7913237c0b", selection: "91736a4ba102c4dc9c14e5d312573153dc04c69992fc117d97046f64f26d33a9" })
-      assert(def.images["cmummy42.pcx"], { type: "pcx (frame)", width: 50, height: 112, x: 174, y: 157, data: "9ddcea0f56781f6e6e062cb3984713964ada331d62617314924b02866284c8c2", selection: "680655b9abc255d7e32d9d26e3ffa6dde94fffeaa20e1a1f1a970d1a570fd9e9" })
+      assert(def.images["cmummy01.pcx"], { width: 58, height: 107, x: 170, y: 161, data: "8bfd518ff70b23a42d23b573802acaf4b8055ae361edd4171afd7c265fe7d8e9" })
+      assert(def.images["cmummy41.pcx"], { width: 44, height: 105, x: 174, y: 164, data: "a341bf95e1876da8712682e634500c86bfa48b5d985bc7f1d2cbed7913237c0b", selection: "91736a4ba102c4dc9c14e5d312573153dc04c69992fc117d97046f64f26d33a9" })
+      assert(def.images["cmummy42.pcx"], { width: 50, height: 112, x: 174, y: 157, data: "9ddcea0f56781f6e6e062cb3984713964ada331d62617314924b02866284c8c2", selection: "680655b9abc255d7e32d9d26e3ffa6dde94fffeaa20e1a1f1a970d1a570fd9e9" })
    })
 
 })
