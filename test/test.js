@@ -17,7 +17,10 @@ const hashes = {
    "AH16_.msk": "e702a1b9c463f2fef2349a19984d27c8107d1638658183c4e591fa0bf9112382",
    "Cmummy.def": "de1d4367c68838d79a7331ccbaca086cd3aa3ae409bba054ee7f992d282e0f55",
    "BoArt120.pcx": "8f8d0b330ae12cfdb1f7b581cf0d1d239828bfef626ce3f4df0e9746e1a1c3cd",
-   "CslReE3c.pcx": "d99fc077dc70e7173b08fc59291486ce86f19fee50116847a00f097bc4b6df22"
+   "CslReE3c.pcx": "d99fc077dc70e7173b08fc59291486ce86f19fee50116847a00f097bc4b6df22",
+   "ArtifBon.def": "0739c23c1ee600e3ef12a9661c7dc46d607979f502a282e578f9cd7b93ffdd6f",
+   "AVCvgarm.def": "824f012514ab7f9fff7c6f418f14b90ff70ef86373955af0d02be7525604f02b",
+   "CRDRGN.def": "434cf98ef1981b476dac398da0f2ff1f468fcb5e2a81c66896b0a9f4e0e21fff"
 }
 
 // Check if test files are present.
@@ -109,6 +112,70 @@ describe("def", function(){
       assert(def.images["cmummy01.pcx"], { width: 58, height: 107, x: 170, y: 161, data: "8bfd518ff70b23a42d23b573802acaf4b8055ae361edd4171afd7c265fe7d8e9" })
       assert(def.images["cmummy41.pcx"], { width: 44, height: 105, x: 174, y: 164, data: "a341bf95e1876da8712682e634500c86bfa48b5d985bc7f1d2cbed7913237c0b", selection: "91736a4ba102c4dc9c14e5d312573153dc04c69992fc117d97046f64f26d33a9" })
       assert(def.images["cmummy42.pcx"], { width: 50, height: 112, x: 174, y: 157, data: "9ddcea0f56781f6e6e062cb3984713964ada331d62617314924b02866284c8c2", selection: "680655b9abc255d7e32d9d26e3ffa6dde94fffeaa20e1a1f1a970d1a570fd9e9" })
+   })
+
+   // For now all special colors except for unit selection and shadows in `def (creature)` defs are ignored.
+   it("no special colors", function(){
+      let def
+
+      // Artifact, colors are not special, some happen to use yellow.
+      def = unpackDEF(files["ArtifBon.def"], { format: "png", padding: false })
+      hashArrayBuffers(def)
+      assert(def.type, "def (interface)")
+      assert(def.images["ABon108a.pcx"], {
+         width: 58,
+         height: 64,
+         x: 0,
+         y: 0,
+         data: "f27eca71c56dd318b4935df474ee7829f0bf6f8f7ff71b6859b7a634f455ddaa"
+      })
+
+
+      // Garrison, special color for flags (yellow), intentionally ignored for now.
+      def = unpackDEF(files["AVCvgarm.def"], { format: "png", padding: false })
+      hashArrayBuffers(def)
+      assert(def.type, "def (adventure object)")
+      assert(def.images["AVCvgm00.pcx"], {
+         width: 64,
+         height: 128,
+         x: 0,
+         y: 0,
+         data: "f90391f78919c632d32ed91f184c2ed2ee5a00941aa9069eeb1ae555f56afdf0"
+      })
+
+
+      // Creature DEF, special color only for "mouse over" and "standing" groups.
+      def = unpackDEF(files["CRDRGN.def"], { format: "png", padding: false })
+      hashArrayBuffers(def)
+      assert(def.type, "def (creature)")
+
+      assert(def.images["CRDRGN29.PCX"], {      // Yellow used but not special.
+         width: 163,
+         height: 116,
+         x: 110,
+         y: 153,
+         data: "22450c0c74261c94841c24a0034ba2e24f86937ef94535277c0726bd0da13b6a"
+      })
+
+      assert(def.images["CRDRGN02.PCX"], {      // "mouse over" representative.
+         width: 89,
+         height: 105,
+         x: 174,
+         y: 164,
+         data: "7c9481dc32a2fb44eac6529a52342bf729cc033ecb7a8197891b9e6e4aa86e0d",
+         selection: "a1e2f87a80dc38edf812ebee8ddb2350089530d585e7151a849b87953593b375"
+      })
+
+      assert(def.images["CRDRGN04.PCX"], {      // "standing" representative.
+         width: 88,
+         height: 105,
+         x: 174,
+         y: 164,
+         data: "b6ae6d87b96c9ace062fe66cad91e37c5ea8e90a9790acd81ad2adb3eddb047a",
+         selection: "e8fa6712e970c0b9538465bdedf81d60a74500a59e74cace03a87fa1e6251f36"
+      })
+
+
    })
 
 })
