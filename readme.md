@@ -15,27 +15,21 @@ _If anyone is in need of parsing some other file type (`H3M`, `H3C`, `SND`, `VID
 All functions expect the binary data of a file (__`buffer`__ parameter) in form of an `ArrayBuffer` or node.js `Buffer`.
 
 
-### unpackLOD( buffer, options )
+### unpackLOD( buffer, processor )
 
 Parse .LOD archive files.
 
-__`options.def`__ &raquo; parse def files or keep source data - boolean/options object for `unpackDEF` - defaults to `true`.
+__`processor`__ &raquo; function to process extracted binary data or object with processors for specific file formats - function/object - defaults to `(buffer, filename) => buffer`.
 
-__`options.pcx`__ &raquo; parse pcx files or keep source data - boolean/options object for `unpackPCX` - defaults to `true`.
 
 ```javascript
 // Returns something like
 {
    type: "lod (expansion)",
    files: {
-      "ab.h3c": ArrayBuffer,              // Raw file.
-      "AdvEvent.txt": ArrayBuffer,        // Raw file.
-      "Ar_Bg.pcx": {                      // Parsed pcx file.
-         type: "pcx (rgb)",
-         width: 555,
-         height: 555,
-         data: ArrayBuffer
-      },
+      "ab.h3c": ArrayBuffer,
+      "AdvEvent.txt": ArrayBuffer,
+      "Ar_Bg.pcx": ArrayBuffer,
       …
    }
 }
