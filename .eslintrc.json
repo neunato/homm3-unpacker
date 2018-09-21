@@ -1,0 +1,6 @@
+﻿{
+   "extends": "plugin:so-jah-seh/all",
+   "rules": {
+      "no-bitwise": 0
+   }
+}
