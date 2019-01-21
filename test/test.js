@@ -73,7 +73,7 @@ describe("lod", function() {
       assert(lod.files["Cmummy.def"], hashes["Cmummy.def"])
    })
 
-   it("() => {}", () => {
+   it("(buffer, name) => ...", () => {
       const lod = unpackLOD(files["H3ab_spr.lod"], (buffer, name) => (name === "AH16_.DEF" ? null : buffer))
       hashArrayBuffers(lod)
 
@@ -82,6 +82,15 @@ describe("lod", function() {
       assert(lod.files["AH16_.DEF"], null)
       assert(lod.files["AH16_.msk"], hashes["AH16_.msk"])
       assert(lod.files["Cmummy.def"], hashes["Cmummy.def"])
+   })
+
+   it("(buffer, name, skip) => ...", () => {
+      const lod = unpackLOD(files["H3ab_spr.lod"], (buffer, name, skip) => (name === "AH16_.DEF" ? buffer : skip()))
+      hashArrayBuffers(lod)
+
+      assert(lod.type, "lod (expansion)")
+      assert(Object.keys(lod.files), ["AH16_.DEF"])
+      assert(lod.files["AH16_.DEF"], hashes["AH16_.DEF"])
    })
 
    it("{}", () => {
@@ -95,7 +104,7 @@ describe("lod", function() {
       assert(lod.files["Cmummy.def"], hashes["Cmummy.def"])
    })
 
-   it("{ def: () => {} }", () => {
+   it("{ ext: (buffer, name) => ... }", () => {
       const lod = unpackLOD(files["H3ab_spr.lod"], {
          def: (buffer, name) => (name === "AH16_.DEF" ? null : buffer)
       })
@@ -106,6 +115,18 @@ describe("lod", function() {
       assert(lod.files["AH16_.DEF"], null)
       assert(lod.files["AH16_.msk"], hashes["AH16_.msk"])
       assert(lod.files["Cmummy.def"], hashes["Cmummy.def"])
+   })
+
+   it("{ ext: (buffer, name, skip) => ... }", () => {
+      const lod = unpackLOD(files["H3ab_spr.lod"], {
+         def: (buffer, name, skip) => (name === "AH16_.DEF" ? buffer : skip()),
+         msk: (buffer, name, skip) => skip()
+      })
+      hashArrayBuffers(lod)
+
+      assert(lod.type, "lod (expansion)")
+      assert(Object.keys(lod.files), ["AH16_.DEF"])
+      assert(lod.files["AH16_.DEF"], hashes["AH16_.DEF"])
    })
 
 })
