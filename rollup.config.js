@@ -1,7 +1,7 @@
 
 import resolve from "rollup-plugin-node-resolve"
 import cjs     from "rollup-plugin-commonjs"
-import uglify  from "rollup-plugin-uglify"
+import minify  from "rollup-plugin-babel-minify"
 
 export default {
    input: "lib/index.js",
@@ -11,5 +11,5 @@ export default {
       format: "iife",
       extend: true
    },
-   plugins: [resolve(), cjs(), uglify()]
+   plugins: [resolve(), cjs(), minify({ comments: false })]
 }
