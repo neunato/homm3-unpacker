@@ -1,0 +1,504 @@
+
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+a {
+   text-decoration: none;
+}
+
+ul, ol {
+   list-style-type: none;
+}
+
+body {
+   font-family: Roboto, Helvetica, Arial;
+   color: rgba(0,0,0,.85);
+   background-color: #f5f5f5;
+   line-height: 1.5em;
+}
+
+svg {
+   opacity: 0.6;
+}
+
+.hidden {
+   display: none !important;
+}
+
+.fullscreen {
+   position: fixed !important;
+   top: 0 !important;
+   left: 0 !important;
+   height: 100% !important;
+   width: 100% !important;
+}
+
+
+/* DROP BOX */
+
+#root.dragging::before {
+   content: "Drop to open";
+   position: fixed;
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 5px dashed #94cdfa;
+   background-color: rgb(255,255,255,.85);
+   font-size: 18px;
+   color: #0087f7;
+   z-index: 100;
+}
+
+
+/* HEADER */
+
+header {
+   position: fixed;
+   width: 100%;
+   height: 40px;
+   background-color: #e4e4e4;
+   cursor: default;
+}
+
+header::after {
+   content: "";
+   position: absolute;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   height: 3px;
+   background-color: rgba(255,255,255,.2);
+}
+
+header h1 {
+   display: inline-block;
+   width: 225px;
+   height: 100%;
+   line-height: 40px;
+   font-size: 15px;
+   text-align: center;
+   letter-spacing: 2px;
+   background-color: #4dadf7;
+   color: rgba(255,255,255,.5);
+}
+
+.splash header h1 {
+   width: 100%;
+}
+
+header h2 {
+   display: inline-block;
+   height: 100%;
+   line-height: 40px;
+   font-size: 15px;
+   padding-left: 10px;
+   color: rgba(0,0,0,.5);
+}
+
+header svg {
+   position: absolute;
+   top: 0;
+   right: 5px;
+   height: 37px;
+}
+
+header svg + svg {
+   right: 30px;
+}
+
+header svg:hover {
+   opacity: 1;
+}
+
+
+/* NAVIGATION */
+
+nav {
+   position: fixed;
+   top: 40px;
+   bottom: 0;
+   width: 225px;
+   background-color: #4dadf7;
+   user-select: none;
+}
+
+nav #tabs {
+   position: absolute;
+   top: 1px;
+   bottom: 31px;
+}
+
+nav #tabs ol {
+   width: 225px;
+   height: 100%;
+   text-align: left;
+   white-space: nowrap;
+}
+
+nav #tabs li {
+   position: relative;
+   width: 100%;
+   padding: 12.5px;
+   line-height: 1em;
+   box-sizing: border-box;
+   font-size: 15px;
+   color: rgba(255,255,255,.9);
+   z-index: 2;                    /* over scrollbar */
+   cursor: pointer;
+}
+
+nav #tabs li:hover,
+nav #tabs li.active {
+   background-color: rgba(255,255,255,.13);
+}
+
+nav #tabs li .close {
+   visibility: hidden;
+   position: absolute;
+   top: 0;
+   right: 7.5px;
+   line-height: 30px;
+   padding: 5px;
+   text-align: right;
+   font-size: 20px;
+   color: rgba(0,0,0,.2);
+   cursor: default;
+}
+
+nav #tabs li:hover .close {
+   visibility: visible;
+}
+
+nav #tabs li .close:hover {
+   color: #dc0311;
+}
+
+nav #upload-button {
+   position: absolute;
+   bottom: 0;
+   width: 100%;
+   height: 30px;
+   padding: 3px;
+   text-align: center;
+   background-color: rgba(255,255,255,.2);
+}
+
+nav #upload-button:hover svg {
+   opacity: 0.9;
+}
+
+
+/* MAIN CONTENT */
+
+main,
+#small-screen-message {
+   position: fixed;
+   top: 40px;
+   bottom: 0;
+   left: 225px;
+   right: 0;
+   padding: 15px;
+   overflow: auto;
+}
+
+.splash .message,
+#small-screen-message {
+   left: 0 !important;
+}
+
+#small-screen-message {
+   display: none;
+}
+
+.message {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.message p {
+   white-space: pre-wrap;
+   font-size: 18px;
+   color: #0087f7;
+   padding: 10px;   
+}
+
+main.clickable {
+   user-select: none;
+}
+
+main.clickable:hover p {
+   border: 1px solid #ececec;
+   background-color: white;
+}
+
+#root.dragging .message {
+   display: none;
+}
+
+/* txt specific */
+
+main.txt {
+   white-space: pre;
+   overflow-x: auto;
+}
+
+/* lod specific */
+
+main.lod {
+   padding-right: 0;
+}
+
+main.lod #lod-types {
+   position: relative;
+   user-select: none;
+   margin-bottom: 10px;
+}
+
+main.lod #lod-types::before {
+   content: "";
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 15px;
+   background-color: #e4e4e4;
+   z-index: -1;
+}
+
+main.lod #lod-types input {
+   position: absolute;
+   height: 35px;
+   width: 18px;
+   margin: 5px 10px;
+   z-index: -1;
+}
+
+main.lod #lod-types label {
+   display: block;
+   line-height: 45px;
+   padding-left: 35px;
+   color: rgba(0,0,0,.6);
+}
+
+main.lod #lod-types label:hover {
+   color: rgba(0,0,0,.9);
+}
+
+main.lod li {
+   display: inline-block;
+   width: 160px;
+   padding: 5px 10px;
+}
+
+main.lod #lod-types li {
+   padding: 0
+}
+
+main.lod #lod-files li:hover {
+   background-color: white;
+   cursor: pointer;
+}
+
+/* def specific */
+
+main .def-groups {
+   position: absolute;
+   top: 15px;
+   bottom: 15px;
+   right: 15px;
+   padding: 5px;
+   overflow-y: auto;
+   background-color: #e4e4e4;
+   color: rgba(0,0,0,.6);
+   cursor: default;
+}
+
+main .def-groups dt,
+main .def-groups dd {
+   width: 160px;               /* width in children as we want scrollbar outside */
+}
+
+main .def-groups dt {
+   position: relative;
+   line-height: 30px;
+   padding-left: 9px;
+   font-size: 11px;
+   text-transform: uppercase;
+}
+
+main .def-groups li {
+   line-height: 30px;
+   padding-left: 14px;
+   font-size: 12px;
+}
+
+main .def-groups dt:hover,
+main .def-groups li:hover {
+   color: rgba(0,0,0,.9);
+}
+
+main .def-groups .selected {
+   background-color: #f4f4f4;
+   color: rgba(0,0,0,.9) !important;
+}
+
+main .def-groups dt span.toggle {
+   position: absolute;
+   top: 0;
+   right: 0;
+   height: 30px;
+   width: 30px;
+   line-height: 30px;
+   text-align: center;
+   font-size: 10px;
+   color: rgba(0,0,0,.2);
+   user-select: none;
+}
+
+main .def-groups dt span.toggle:hover {
+   background-color: #ebebeb;
+   color: rgba(0,0,0,.5);
+}
+
+/* def + pcx specific */
+
+main .canvas {
+   position: absolute;
+   left: 15px;
+   right: 15px;
+   top: 15px;
+   bottom: 15px;
+}
+
+main.def .canvas {
+   right: 185px;
+}
+
+main .canvas canvas {
+   width: 100%;
+   height: 100%;
+}
+
+main .canvas .scale {
+   position: absolute;
+   bottom: -15px;
+   left: -5px;
+   line-height: 30px;
+   font-family: monospace;
+}
+
+
+/* GITHUB LINK */
+
+.splash #github-link {
+   display: block;
+}
+
+#github-link {
+   position: fixed;
+   bottom: 0;
+   right: 0;
+   width: 30px;
+   height: 30px;
+   padding: 5px;
+   display: none;
+}
+
+#github-link:hover svg {
+   opacity: 1;
+}
+
+
+/* BRIEF MESSAGE */
+
+#note {
+   position: fixed;
+   bottom: 5px;
+   width: 100%;
+   text-align: center;
+}
+
+#note p {
+   display: inline-block;
+   width: 350px;
+   line-height: 35px;
+   background-color: rgba(0,0,0,0.7);
+   color: white;
+   border-radius: 2px;
+}
+
+#note.disappear-leave-to {
+   opacity: 0;
+}
+
+#note.disappear-leave-active {
+   transition: opacity 5000ms ease-in 500ms;
+}
+
+
+/* SCROLLBARS */
+
+.os-scrollbar-handle {
+   background-color: rgba(0,0,0,0.3) !important;
+}
+
+.os-scrollbar-handle:hover {
+   background-color: rgba(0,0,0,0.4) !important;
+}
+
+.def-groups .os-scrollbar {
+   width: 5px !important;
+   padding: 1px !important;
+}
+
+
+/* MEDIA QUERIES */
+
+@media screen and (max-width: 360px),
+       screen and (max-height: 260px) {
+
+   nav, 
+   main,
+   header > * {
+      display: none !important;
+   }
+
+   header h1 {
+      display: block !important;
+      width: 100%;
+   }
+
+   #small-screen-message {
+      display: flex;
+   }
+
+   #github-link {
+      display: block !important;
+   }
+
+}
+
+@media screen and (max-width: 520px) {
+
+   nav,
+   #root:not(.splash) header h1 {
+      display: none;
+   }
+
+   #root:not(.splash) header h2 {
+      width: 100%;
+   }
+
+   main {
+      left: 0;
+   }
+
+}

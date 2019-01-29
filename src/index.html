@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.6.1/css/OverlayScrollbars.min.css" rel="stylesheet">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.6.1/js/OverlayScrollbars.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/homm3-unpacker@0.3.0/dist/homm3-unpacker.js"></script>
+   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-91559453-2"></script>
+   <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-91559453-2');</script>
+
+   <style> 
+   <<< CSS >>>
+   </style>
+</head>
+
+<body>
+
+   <main id="root" class="message"><p>Loading...</p></div>
+
+   <script>
+      function NotFoundError () {}
+      window.onerror = function (_, _, _, _, error) {
+         var message
+         if (error instanceof SyntaxError)
+            message = "Sorry, browser not supported"
+         else if (error instanceof NotFoundError)
+            message = "Loading failed, please try again"
+         else
+            return
+
+         document.body.innerHTML = '<main id="root" class="fullscreen message"><p>' + message + '</p></main>'
+
+         if (window.stop)
+            window.stop()
+         else
+            document.execCommand("Stop")    // IE.
+      }
+   </script>
+
+   <script>
+      document.addEventListener("DOMContentLoaded", function () {
+         "use strict"
+
+         if (!window["homm3-unpacker"] || !window["OverlayScrollbars"])
+            throw new NotFoundError()
+
+         const { unpackLOD, unpackDEF, unpackPCX } = window["homm3-unpacker"]
+         const { OverlayScrollbars } = window
+
+         <<< JS >>>
+      })
+   </script>
+
+</body>
+</html>
+
+

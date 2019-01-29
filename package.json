@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp default",
+    "lint": "eslint src/"
+  },
+  "devDependencies": {
+    "eslint": "5.12.1",
+    "eslint-plugin-so-jah-seh": "0.1.2",
+    "glupost": "3.1.1"
+  }
+}

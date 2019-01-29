@@ -1,0 +1,13 @@
+﻿{
+   "extends": "plugin:so-jah-seh/all",
+   "rules": {
+      "strict": 0
+   },
+   "globals": {
+      "unpackLOD": false,
+      "unpackDEF": false,
+      "unpackPCX": false,
+      "Vue": false,
+      "OverlayScrollbars": false
+   }
+}

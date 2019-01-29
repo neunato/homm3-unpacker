@@ -4,92 +4,559 @@
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
-   <link rel="stylesheet" type="text/css" href="index.css">   
-   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-   <script src="homm3-unpacker.js"></script>
-   <script src="vue.min.js"></script>
 
+   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.6.1/css/OverlayScrollbars.min.css" rel="stylesheet">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.6.1/js/OverlayScrollbars.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/homm3-unpacker@0.3.0/dist/homm3-unpacker.js"></script>
    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-91559453-2"></script>
    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'UA-91559453-2');</script>
+
+   <style> 
+   
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+a {
+   text-decoration: none;
+}
+
+ul, ol {
+   list-style-type: none;
+}
+
+body {
+   font-family: Roboto, Helvetica, Arial;
+   color: rgba(0,0,0,.85);
+   background-color: #f5f5f5;
+   line-height: 1.5em;
+}
+
+svg {
+   opacity: 0.6;
+}
+
+.hidden {
+   display: none !important;
+}
+
+.fullscreen {
+   position: fixed !important;
+   top: 0 !important;
+   left: 0 !important;
+   height: 100% !important;
+   width: 100% !important;
+}
+
+
+/* DROP BOX */
+
+#root.dragging::before {
+   content: "Drop to open";
+   position: fixed;
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   border: 5px dashed #94cdfa;
+   background-color: rgb(255,255,255,.85);
+   font-size: 18px;
+   color: #0087f7;
+   z-index: 100;
+}
+
+
+/* HEADER */
+
+header {
+   position: fixed;
+   width: 100%;
+   height: 40px;
+   background-color: #e4e4e4;
+   cursor: default;
+}
+
+header::after {
+   content: "";
+   position: absolute;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   height: 3px;
+   background-color: rgba(255,255,255,.2);
+}
+
+header h1 {
+   display: inline-block;
+   width: 225px;
+   height: 100%;
+   line-height: 40px;
+   font-size: 15px;
+   text-align: center;
+   letter-spacing: 2px;
+   background-color: #4dadf7;
+   color: rgba(255,255,255,.5);
+}
+
+.splash header h1 {
+   width: 100%;
+}
+
+header h2 {
+   display: inline-block;
+   height: 100%;
+   line-height: 40px;
+   font-size: 15px;
+   padding-left: 10px;
+   color: rgba(0,0,0,.5);
+}
+
+header svg {
+   position: absolute;
+   top: 0;
+   right: 5px;
+   height: 37px;
+}
+
+header svg + svg {
+   right: 30px;
+}
+
+header svg:hover {
+   opacity: 1;
+}
+
+
+/* NAVIGATION */
+
+nav {
+   position: fixed;
+   top: 40px;
+   bottom: 0;
+   width: 225px;
+   background-color: #4dadf7;
+   user-select: none;
+}
+
+nav #tabs {
+   position: absolute;
+   top: 1px;
+   bottom: 31px;
+}
+
+nav #tabs ol {
+   width: 225px;
+   height: 100%;
+   text-align: left;
+   white-space: nowrap;
+}
+
+nav #tabs li {
+   position: relative;
+   width: 100%;
+   padding: 12.5px;
+   line-height: 1em;
+   box-sizing: border-box;
+   font-size: 15px;
+   color: rgba(255,255,255,.9);
+   z-index: 2;                    /* over scrollbar */
+   cursor: pointer;
+}
+
+nav #tabs li:hover,
+nav #tabs li.active {
+   background-color: rgba(255,255,255,.13);
+}
+
+nav #tabs li .close {
+   visibility: hidden;
+   position: absolute;
+   top: 0;
+   right: 7.5px;
+   line-height: 30px;
+   padding: 5px;
+   text-align: right;
+   font-size: 20px;
+   color: rgba(0,0,0,.2);
+   cursor: default;
+}
+
+nav #tabs li:hover .close {
+   visibility: visible;
+}
+
+nav #tabs li .close:hover {
+   color: #dc0311;
+}
+
+nav #upload-button {
+   position: absolute;
+   bottom: 0;
+   width: 100%;
+   height: 30px;
+   padding: 3px;
+   text-align: center;
+   background-color: rgba(255,255,255,.2);
+}
+
+nav #upload-button:hover svg {
+   opacity: 0.9;
+}
+
+
+/* MAIN CONTENT */
+
+main,
+#small-screen-message {
+   position: fixed;
+   top: 40px;
+   bottom: 0;
+   left: 225px;
+   right: 0;
+   padding: 15px;
+   overflow: auto;
+}
+
+.splash .message,
+#small-screen-message {
+   left: 0 !important;
+}
+
+#small-screen-message {
+   display: none;
+}
+
+.message {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.message p {
+   white-space: pre-wrap;
+   font-size: 18px;
+   color: #0087f7;
+   padding: 10px;   
+}
+
+main.clickable {
+   user-select: none;
+}
+
+main.clickable:hover p {
+   border: 1px solid #ececec;
+   background-color: white;
+}
+
+#root.dragging .message {
+   display: none;
+}
+
+/* txt specific */
+
+main.txt {
+   white-space: pre;
+   overflow-x: auto;
+}
+
+/* lod specific */
+
+main.lod {
+   padding-right: 0;
+}
+
+main.lod #lod-types {
+   position: relative;
+   user-select: none;
+   margin-bottom: 10px;
+}
+
+main.lod #lod-types::before {
+   content: "";
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   left: 0;
+   right: 15px;
+   background-color: #e4e4e4;
+   z-index: -1;
+}
+
+main.lod #lod-types input {
+   position: absolute;
+   height: 35px;
+   width: 18px;
+   margin: 5px 10px;
+   z-index: -1;
+}
+
+main.lod #lod-types label {
+   display: block;
+   line-height: 45px;
+   padding-left: 35px;
+   color: rgba(0,0,0,.6);
+}
+
+main.lod #lod-types label:hover {
+   color: rgba(0,0,0,.9);
+}
+
+main.lod li {
+   display: inline-block;
+   width: 160px;
+   padding: 5px 10px;
+}
+
+main.lod #lod-types li {
+   padding: 0
+}
+
+main.lod #lod-files li:hover {
+   background-color: white;
+   cursor: pointer;
+}
+
+/* def specific */
+
+main .def-groups {
+   position: absolute;
+   top: 15px;
+   bottom: 15px;
+   right: 15px;
+   padding: 5px;
+   overflow-y: auto;
+   background-color: #e4e4e4;
+   color: rgba(0,0,0,.6);
+   cursor: default;
+}
+
+main .def-groups dt,
+main .def-groups dd {
+   width: 160px;               /* width in children as we want scrollbar outside */
+}
+
+main .def-groups dt {
+   position: relative;
+   line-height: 30px;
+   padding-left: 9px;
+   font-size: 11px;
+   text-transform: uppercase;
+}
+
+main .def-groups li {
+   line-height: 30px;
+   padding-left: 14px;
+   font-size: 12px;
+}
+
+main .def-groups dt:hover,
+main .def-groups li:hover {
+   color: rgba(0,0,0,.9);
+}
+
+main .def-groups .selected {
+   background-color: #f4f4f4;
+   color: rgba(0,0,0,.9) !important;
+}
+
+main .def-groups dt span.toggle {
+   position: absolute;
+   top: 0;
+   right: 0;
+   height: 30px;
+   width: 30px;
+   line-height: 30px;
+   text-align: center;
+   font-size: 10px;
+   color: rgba(0,0,0,.2);
+   user-select: none;
+}
+
+main .def-groups dt span.toggle:hover {
+   background-color: #ebebeb;
+   color: rgba(0,0,0,.5);
+}
+
+/* def + pcx specific */
+
+main .canvas {
+   position: absolute;
+   left: 15px;
+   right: 15px;
+   top: 15px;
+   bottom: 15px;
+}
+
+main.def .canvas {
+   right: 185px;
+}
+
+main .canvas canvas {
+   width: 100%;
+   height: 100%;
+}
+
+main .canvas .scale {
+   position: absolute;
+   bottom: -15px;
+   left: -5px;
+   line-height: 30px;
+   font-family: monospace;
+}
+
+
+/* GITHUB LINK */
+
+.splash #github-link {
+   display: block;
+}
+
+#github-link {
+   position: fixed;
+   bottom: 0;
+   right: 0;
+   width: 30px;
+   height: 30px;
+   padding: 5px;
+   display: none;
+}
+
+#github-link:hover svg {
+   opacity: 1;
+}
+
+
+/* BRIEF MESSAGE */
+
+#note {
+   position: fixed;
+   bottom: 5px;
+   width: 100%;
+   text-align: center;
+}
+
+#note p {
+   display: inline-block;
+   width: 350px;
+   line-height: 35px;
+   background-color: rgba(0,0,0,0.7);
+   color: white;
+   border-radius: 2px;
+}
+
+#note.disappear-leave-to {
+   opacity: 0;
+}
+
+#note.disappear-leave-active {
+   transition: opacity 5000ms ease-in 500ms;
+}
+
+
+/* SCROLLBARS */
+
+.os-scrollbar-handle {
+   background-color: rgba(0,0,0,0.3) !important;
+}
+
+.os-scrollbar-handle:hover {
+   background-color: rgba(0,0,0,0.4) !important;
+}
+
+.def-groups .os-scrollbar {
+   width: 5px !important;
+   padding: 1px !important;
+}
+
+
+/* MEDIA QUERIES */
+
+@media screen and (max-width: 360px),
+       screen and (max-height: 260px) {
+
+   nav, 
+   main,
+   header > * {
+      display: none !important;
+   }
+
+   header h1 {
+      display: block !important;
+      width: 100%;
+   }
+
+   #small-screen-message {
+      display: flex;
+   }
+
+   #github-link {
+      display: block !important;
+   }
+
+}
+
+@media screen and (max-width: 520px) {
+
+   nav,
+   #root:not(.splash) header h1 {
+      display: none;
+   }
+
+   #root:not(.splash) header h2 {
+      width: 100%;
+   }
+
+   main {
+      left: 0;
+   }
+
+}
+
+   </style>
 </head>
 
 <body>
 
+   <main id="root" class="message"><p>Loading...</p></div>
 
-<script>
-   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror#window.onerror
-   // For some reason, error is undefined in IE, but message is "Syntax error".
-   window.onerror = function( message ){
-      if( message === "Syntax error" ){
-         document.body.innerHTML = '<main class="message"><p>Sorry, browser not supported</p></main>'
-         if( window.stop )
+   <script>
+      function NotFoundError () {}
+      window.onerror = function (_, _, _, _, error) {
+         var message
+         if (error instanceof SyntaxError)
+            message = "Sorry, browser not supported"
+         else if (error instanceof NotFoundError)
+            message = "Loading failed, please try again"
+         else
+            return
+
+         document.body.innerHTML = '<main id="root" class="fullscreen message"><p>' + message + '</p></main>'
+
+         if (window.stop)
             window.stop()
          else
             document.execCommand("Stop")    // IE.
       }
-   }
-</script>
+   </script>
 
+   <script>
+      document.addEventListener("DOMContentLoaded", function () {
+         "use strict"
 
-<main id="root" class="message"><p>Loading...</p></div>
+         if (!window["homm3-unpacker"] || !window["OverlayScrollbars"])
+            throw new NotFoundError()
 
+         const { unpackLOD, unpackDEF, unpackPCX } = window["homm3-unpacker"]
+         const { OverlayScrollbars } = window
 
-<script>
-
-document.addEventListener("DOMContentLoaded", function(){
-
-"use strict"
-
-
-const { unpackLOD, unpackDEF, unpackPCX } = window["homm3-unpacker"]
-
-
-
-Vue.component("app-main-txt", {
-   template:
-     `<main class="txt" ref="main" @scroll="scrollTop = $event.target.scrollTop">
-         <p>{{ text }}</p>
-      </main>`,
-
-   props: ["file"],
-
-   data: () => ({
-      scrollTop: 0
-   }),
-
-   computed: {
-      text(){
-         // Split into chunks due to number of parameters limit.
-         const bytes = new Uint8Array(this.file)
-         let result = ""
-         for( let i = 0; i < bytes.length; i += 8192 )
-            result += String.fromCharCode(...bytes.slice(i, i + 8192))
-         return result
-      }
-   },
-
-   activated(){
-      this.$refs.main.scrollTop = this.scrollTop
-   }
-})
-
-Vue.component("app-main-lod", {
-   template:
-     `<main class="lod" ref="main" @scroll="scrollTop = $event.target.scrollTop">
-         <ol><li v-for="(child, name) of file.files" @click="$emit('add-file', name, child)">{{ name }}</li></ol>
-      </main>`,
-
-   props: ["file"],
-
-   data: () => ({
-      scrollTop: 0
-   }),
-
-   activated(){
-      this.$refs.main.scrollTop = this.scrollTop
-   }
-})
-
+         
 Vue.component("app-main-def", {
    template:
       `<main class="def">
@@ -109,37 +576,48 @@ Vue.component("app-main-def", {
    props: ["file"],
 
    data: ({ file }) => ({
-      selected: file.groups[Object.keys(file.groups)[0]],       // Select first group.
-      collapsed: Object.keys(file.groups).reduce((r, n) => { r[n] = true; return r }, {}),
+      selected: file.groups[Object.keys(file.groups)[0]],
+      collapsed: Object.keys(file.groups).reduce((r, n) => (r[n] = true, r), {}),        // eslint-disable-line no-return-assign, no-sequences
       scrollTop: 0
    }),
 
+   activated() {
+      this.$refs.nav.scrollTop = this.scrollTop
+   },
+
+   mounted() {
+      OverlayScrollbars(this.$refs.nav, { overflowBehavior: { x: "hidden" } })           // eslint-disable-line new-cap
+   },
+
    computed: {
-      activeFrames(){
-         if( !this.selected )
+      activeFrames() {
+         if (!this.selected)
             return null
 
-         const images = this.file.images
-         if( typeof this.selected === "string" )
+         const { images } = this.file
+         if (typeof this.selected === "string")
             return [images[this.selected]]
          else
-            return this.selected.map(name => images[name])
+            return this.selected.map((name) => images[name])
       },
 
       // Drawing "box" for centering; all images considered.
-      box(){
-         let top = Infinity, left = Infinity, bottom = 0, right = 0
+      box() {
+         let top = Infinity
+         let left = Infinity
+         let bottom = 0
+         let right = 0
 
          const names = Object.keys(this.file.images)
-         for( const name of names ){
+         for (const name of names) {
             const image = this.file.images[name]
-            if( image.y < top )
+            if (image.y < top)
                top = image.y
-            if( image.y + image.height > bottom )
+            if (image.y + image.height > bottom)
                bottom = image.y + image.height
-            if( image.x < left )
+            if (image.x < left)
                left = image.x
-            if( image.x + image.width > right )
+            if (image.x + image.width > right)
                right = image.x + image.width
          }
 
@@ -150,12 +628,51 @@ Vue.component("app-main-def", {
             height: bottom - top
          }
       }
-   },
-
-   activated(){
-      this.$refs.nav.scrollTop = this.scrollTop
    }
 })
+
+
+
+Vue.component("app-main-lod", {
+   template:
+     `<main class="lod" ref="main" @scroll="scrollTop = $event.target.scrollTop">
+         <ol id="lod-types"><li v-for="(ext, i) of extensions"><input type="checkbox" :id="'type' + (i + 1)" :value="ext" v-model="checkboxes"><label :for="'type' + (i + 1)">.{{ ext }}</label></li></ol>
+         <ol id="lod-files"><li v-for="({name, buffer, ext}) of files" v-show="selectedExtensions[ext]" @click="$emit('add-file', name, buffer)">{{ name }}</li></ol>
+      </main>`,
+
+   props: ["file"],
+
+   data: () => ({
+      scrollTop: 0,
+      checkboxes: []
+   }),
+
+   computed: {
+      files() {
+         return Object.entries(this.file.files).map(([name, buffer]) => ({
+            name,
+            buffer,
+            ext: name.slice((name.lastIndexOf(".") + 1) || name.length).toLowerCase()
+         }))
+      },
+
+      extensions() {
+         const extensions = [...new Set(this.files.map(({ ext }) => ext))]
+         this.checkboxes = extensions
+         return extensions
+      },
+
+      selectedExtensions() {
+         return this.extensions.reduce((r, c) => (r[c] = this.checkboxes.includes(c), r), {})    // eslint-disable-line no-return-assign, no-sequences
+      }
+   },
+
+   activated() {
+      this.$refs.main.scrollTop = this.scrollTop
+   }
+})
+
+
 
 Vue.component("app-main-pcx", {
    template:
@@ -166,7 +683,7 @@ Vue.component("app-main-pcx", {
    props: ["file"],
 
    computed: {
-      box(){
+      box() {
          return {
             x: 0,
             y: 0,
@@ -177,13 +694,47 @@ Vue.component("app-main-pcx", {
    }
 })
 
+
+
 Vue.component("app-main-message", {
-   template: `<main class="message"><p>{{ message }}</p></main>`,
+   template: "<main class=\"message\" @click=\"$emit('click')\"><p>{{ message }}</p></main>",
    props: ["message"]
 })
 
+
+
+Vue.component("app-main-txt", {
+   template:
+     `<main class="txt" ref="main" @scroll="scrollTop = $event.target.scrollTop">
+         <p>{{ text }}</p>
+      </main>`,
+
+   props: ["file"],
+
+   data: () => ({
+      scrollTop: 0
+   }),
+
+   activated() {
+      this.$refs.main.scrollTop = this.scrollTop
+   },
+
+   computed: {
+      text() {
+         // Split into chunks due to number of parameters limit.
+         const bytes = new Uint8Array(this.file)
+         let result = ""
+         for (let i = 0; i < bytes.length; i += 8192)
+            result += String.fromCharCode(...bytes.slice(i, i + 8192))
+         return result
+      }
+   }
+})
+
+
+
 Vue.component("app-canvas", {
-   template: 
+   template:
      `<section class="canvas">
          <canvas ref="canvas"></canvas>
          <span class="scale">{{ scale }}x</span>
@@ -201,124 +752,132 @@ Vue.component("app-canvas", {
       image: null              // Currently drawn frame.
    }),
 
-   computed: {
-      maxScale(){
-         return Math.floor( Math.min(this.width / (this.box.width + 2), this.height / (this.box.height + 2)) )
-      }
-   },
-
-   watch: {
-      activeFrames(){ this.start() },
-   },
-
-   activated(){  
+   activated() {
       this.start()
    },
 
-   deactivated(){
+   deactivated() {
       this.stop()
    },
 
-   mounted(){
-      const canvas = this.$refs.canvas
+   mounted() {
+      const { canvas } = this.$refs
       this.context = canvas.getContext("2d")
 
       window.addEventListener("resize", () => {
-         if( !this.image )
+         if (!this.image)
             return
 
-         this.width = canvas.width = canvas.clientWidth
-         this.height = canvas.height = canvas.clientHeight
-         this.rescale(this.scale)         
+         canvas.width = canvas.clientWidth
+         canvas.height = canvas.clientHeight
+         this.width = canvas.width
+         this.height = canvas.height
+
+         this.rescale(this.scale)
          this.draw(this.image)
       })
 
       canvas.addEventListener("wheel", (e) => {
-         if( e.deltaY < 0 )
+         if (e.deltaY < 0)
             this.rescale(this.scale + 1)
          else
             this.rescale(this.scale - 1)
       })
    },
 
+   computed: {
+      maxScale() {
+         return Math.floor(Math.min(this.width / (this.box.width + 2), this.height / (this.box.height + 2)))
+      }
+   },
+
+   watch: {
+      activeFrames() {
+         this.start()
+      }
+   },
+
    methods: {
-      start(){
+      start() {
          // Stop previous animation.
          this.stop()
 
-         const canvas = this.context.canvas
-         this.width = canvas.width = canvas.clientWidth
-         this.height = canvas.height = canvas.clientHeight
+         const { canvas } = this.context
+         canvas.width = canvas.clientWidth
+         canvas.height = canvas.clientHeight
+         this.width = canvas.width
+         this.height = canvas.height
+
          this.rescale(this.scale)
 
          // Start drawing (single image or animation).
-         if( this.activeFrames.length === 1 )
+         if (this.activeFrames.length === 1)
             this.draw(this.activeFrames[0])
          else
             this.animate(this.activeFrames)
       },
 
-      stop(){
+      stop() {
          this.image = null
-         if( this.running ){
+         if (this.running) {
             window.cancelAnimationFrame(this.running)
             this.running = null
          }
       },
 
-      rescale( value ){
+      rescale(value) {
          value = Math.max(1, Math.min(this.maxScale, value))
-         if( value === this.scale )
+         if (value === this.scale)
             return
          this.scale = value
          this.draw(this.image)
       },
 
-      animate( images, at = 0 ){
-         const fpaf = this.fpaf
-         if( at % fpaf === 0 ){
-            if( at / fpaf === images.length )
+      animate(images, at = 0) {
+         const { fpaf } = this
+         if (at % fpaf === 0) {
+            if (at / fpaf === images.length)
                at = 0
             this.draw(images[at / fpaf])
          }
 
-         this.running = window.requestAnimationFrame( () => this.animate(images, at + 1) )
+         this.running = window.requestAnimationFrame(() => this.animate(images, at + 1))
       },
 
-      draw( image ){
-         if( !image )
+      draw(image) {
+         if (!image)
             return
 
          this.clear()
          this.image = image
 
-         const context = this.context
-         const box = this.box
-         const scale = this.scale
+         const { context } = this
+         const { box } = this
+         const { scale } = this
 
          const rows = context.canvas.height / scale
          const cols = context.canvas.width / scale
-         const row = Math.floor(rows / 2  -  box.height / 2  +  (image.y || 0) - box.y)
-         const col = Math.floor(cols / 2  -  box.width / 2  +  (image.x || 0) - box.x)
-         
+         const row = Math.floor((rows / 2) - (box.height / 2) + (image.y || 0) - box.y)
+         const col = Math.floor((cols / 2) - (box.width / 2) + (image.x || 0) - box.x)
+
          const view = new Uint8Array(image.data)
 
          let i = 0
-         while( i < view.byteLength ){
+         while (i < view.byteLength) {
             const r = view[i++]
             const g = view[i++]
             const b = view[i++]
             const a = view[i++]
             context.fillStyle = `rgba(${r},${g},${b},${a / 255})`
-            
-            const at = i / 4 - 1
-            const x = col + at % image.width
+
+            const at = (i / 4) - 1
+            const x = col + (at % image.width)
             const y = row + Math.floor(at / image.width)
             context.fillRect(x * scale, y * scale, scale, scale)
          }
       },
 
-      clear(){
+      clear() {
          const { width, height } = this.context.canvas
          this.context.clearRect(0, 0, width, height)
       }
@@ -327,175 +886,181 @@ Vue.component("app-canvas", {
 
 })
 
-const root = new Vue({
 
+
+new Vue({
    el: "#root",
 
    template:
-     `<div id="root" :class="{ dragging }" @drop.prevent="onDrop($event)" @dragover.prevent @dragenter="dragCounter++" @dragleave="dragCounter--">
+     `<div id="root" :class="{ dragging, splash: !tabs.length }" @drop.prevent="onDrop($event)" @dragover.prevent @dragenter="dragCounter++" @dragleave="dragCounter--">
 
-         <nav v-if="tabs.length" id="tabs">
-            <ol ref="tabs" :style="{ left: tabsOffsetLeft + 'px' }">
-               <li v-for="tab of tabs" :class="{ active: tab === activeTab }" @click.stop="openTab(tab)" >{{ tab.name }}<span class="close" @click.stop="removeTab(tab)">&#x2716;</span></li>
-            </ol>
+         <header>
+            <h1>HOMM3 UNPACKER</h1>
+            <template v-if="activeTab">
+               <h2>{{ activeTab.name }}</h2>
+               <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" @click="removeTab(activeTab)"><title>Close</title><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11zm0 10.293l5.293-5.293.707.707-5.293 5.293 5.293 5.293-.707.707-5.293-5.293-5.293 5.293-.707-.707 5.293-5.293-5.293-5.293.707-.707 5.293 5.293z"/></svg>
+               <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" @click="download(activeTab.name, activeTab.buffer)"><title>Download</title><path d="M16.965 2.381c3.593 1.946 6.035 5.749 6.035 10.119 0 6.347-5.153 11.5-11.5 11.5s-11.5-5.153-11.5-11.5c0-4.37 2.442-8.173 6.035-10.119l.608.809c-3.353 1.755-5.643 5.267-5.643 9.31 0 5.795 4.705 10.5 10.5 10.5s10.5-4.705 10.5-10.5c0-4.043-2.29-7.555-5.643-9.31l.608-.809zm-4.965-2.381v14.826l3.747-4.604.753.666-5 6.112-5-6.101.737-.679 3.763 4.608v-14.828h1z"/></svg>
+            </template>
+         </header>
 
-            <div id="tabs-arrows">
-               <span v-show="tabs.length > 1" class="arrow left" @click.stop="openTabPrev"></span>
-               <span v-show="tabs.length > 1" class="arrow right" @click.stop="openTabNext"></span>
+         <nav v-show="tabs.length">
+            <div id="tabs" ref="tabs">
+               <ol>
+                  <li v-for="tab of tabs" :class="{ active: tab === activeTab }" @click.stop="openTab(tab)" >{{ tab.name }}<span class="close" @click.stop="removeTab(tab)">&#x2716;</span></li>
+               </ol>
             </div>
-          </nav>
-
+            <span id="upload-button" @click="selectFiles" title="Upload files"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11.5 0c6.347 0 11.5 5.153 11.5 11.5s-5.153 11.5-11.5 11.5-11.5-5.153-11.5-11.5 5.153-11.5 11.5-11.5zm0 1c5.795 0 10.5 4.705 10.5 10.5s-4.705 10.5-10.5 10.5-10.5-4.705-10.5-10.5 4.705-10.5 10.5-10.5zm.5 10h6v1h-6v6h-1v-6h-6v-1h6v-6h1v6z"/></svg></span>
+         </nav>
+         
          <keep-alive>
-            <app-main-message v-if="loading" message="Loading..."></app-main-message>
-            <app-main-message v-else-if="!activeTab" message="Drop a game file"></app-main-message>
-            <app-main-message v-else-if="activeTab.message" :message="activeTab.message"></app-main-message>
+            <app-main-message v-if="!activeTab && !tabs.length" message="Select or drop game files (lod, def, pcx, txt)" @click="selectFiles" class="clickable"></app-main-message>
+            <app-main-message v-else-if="activeTab.error" message="Unexpected error"></app-main-message>
+            <app-main-message v-else-if="!activeTab.file" message="Loading..."></app-main-message>
             <component v-else :is="'app-main-' + activeTab.type" :file="activeTab.file" @add-file="addTab(...arguments)" :key="activeTab.name"></component>
          </keep-alive>
+
+         <a id="github-link" href="https://github.com/independentgeorge/homm3-unpacker" title="View on GitHub"><svg version="1.1" width="20" height="20" viewBox="0 0 16 16" class="octicon octicon-mark-github" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path></svg></a>
+
+         <transition name="disappear">
+            <div v-if="note" id="note"><p>{{ this.note }}</p></div>
+         </transition>
+
+         <input type="file" ref="file-upload" class="hidden" @change="onSelectFiles" multiple>
+
+         <div id="small-screen-message" class="message"><p>Screen too small</p></div>
 
       </div>`,
 
    data: {
-      activeTab: null,
-      tabs: [],
-      loading: false,
-      dragCounter: 0,           // Used to detect file dragging.
-      tabsOffsetLeft: 0         // Used to keep active nav tab in view.
+      activeTab: null,          // Currently open tab.
+      tabs: [],                 // All added tabs.
+      note: null,               // Briefly shown message.
+      dragCounter: 0            // Used to detect file dragging.
+   },
+
+   mounted() {
+      OverlayScrollbars(this.$refs.tabs, { overflowBehavior: { x: "hidden" } })   // eslint-disable-line new-cap
+      document.addEventListener("drop", (e) => e.preventDefault())
+      document.addEventListener("keydown", (e) => {
+         if (e.key === "Escape" && this.activeTab)
+            this.removeTab(this.activeTab)
+      })
    },
 
    computed: {
-      dragging(){
+      dragging() {
          return this.dragCounter > 0
       }
    },
 
    methods: {
-      openTab( tab ){
+      openTab(tab) {
          this.activeTab = tab
-         this.scrollToTab()
       },
 
-      scrollToTab(){
-         if( !this.activeTab )
-            return
-
-         // Wait for rendering.
-         Vue.nextTick(() => {
-
-            const tabs = this.$refs.tabs
-            const active = tabs.querySelector(".active")
-
-            // Tab overflowing left.
-            if( active.offsetLeft + this.tabsOffsetLeft < 0 ){
-               this.tabsOffsetLeft = 0
-               return
-            }
-
-            const fullWidth = tabs.clientWidth
-
-            // Tab overflowing right.
-            if( active.offsetLeft + active.offsetWidth > fullWidth ){
-               this.tabsOffsetLeft = -(active.offsetLeft + active.offsetWidth - fullWidth)
-               return
-            }
-            
-            // All tabs fit.
-            const last = tabs.querySelector("li:last-child")
-            if( last.offsetLeft + last.offsetWidth < fullWidth ){
-               this.tabsOffsetLeft = 0
-            }
-
-         })
-
-      },
-
-      openTabPrev(){
-         const i = this.tabs.indexOf(this.activeTab)
-         if( i - 1 >= 0 )
-            this.openTab(this.tabs[i - 1])
-      },
-
-      openTabNext(){
-         const i = this.tabs.indexOf(this.activeTab)
-         if( i + 1 < this.tabs.length )
-            this.openTab(this.tabs[i + 1])
-      },
-
-      addTab( name, buffer ){
-         const existing = this.tabs.find(tab => tab.name === name)
-         if( existing ){
+      addTab(name, buffer) {
+         const existing = this.tabs.find((tab) => tab.name === name)
+         if (existing) {
             this.openTab(existing)
             return
          }
 
-         let ext = name.match(/\.([^.]+)$/)
-         if( ext )
-            ext = ext[1].toLowerCase()
-
-         if( !["lod", "def", "pcx", "txt"].includes(ext) ){
-            const tab = { name, message: "Can't open that" }
-            this.tabs.push(tab)
-            this.openTab(tab)
+         const type = name.slice((name.lastIndexOf(".") + 1) || name.length).toLowerCase()
+         if (!["lod", "def", "pcx", "txt"].includes(type)) {
+            this.note = "File not supported"
+            Vue.nextTick(() => (this.note = null))
             return
          }
 
-         let tab = { name, message: "Loading..." }
+         const tab = {
+            name,
+            type,
+            buffer,
+            file: null,
+            error: null
+         }
          this.tabs.push(tab)
          this.openTab(tab)
 
-         window.setTimeout(() => {
-            try{
-               if( ext === "lod" )
-                  tab.file = unpackLOD(buffer, { def: false, pcx: false })
-               else if( ext === "def" )
-                  tab.file = unpackDEF(buffer, { format: "bitmap", padding: false })
-               else if( ext === "pcx" )
-                  tab.file = unpackPCX(buffer, { format: "bitmap", padding: false })
-               else
-                  tab.file = buffer
-             
-               tab.type = ext
-               Vue.delete(tab, "message")  
+         const worker = this.createWorker(({ data: [type, buffer] }) => {
+            const { unpackLOD, unpackDEF, unpackPCX } = self["homm3-unpacker"]
+            let data
+            let transfer = []
+            if (type === "lod") {
+               data = unpackLOD(buffer)
+               transfer = Object.values(data.files)
             }
-            catch(e){
-               tab.message = "Error parsing file"
+            else if (type === "def") {
+               data = unpackDEF(buffer, { format: "bitmap", padding: false })
+               const images = Object.values(data.images)
+               transfer = [...images.map(({ data }) => data), ...images.filter(({ selection }) => selection).map(({ selection }) => selection)]
             }
-         })
+            else if (type === "pcx") {
+               data = unpackPCX(buffer, { format: "bitmap", padding: false })
+               transfer = data.selection ? [data.data, data.selection] : [data.data]
+            }
+            else {
+               data = buffer
+            }
+            self.postMessage(data, transfer)
+         }, ["https://cdn.jsdelivr.net/npm/homm3-unpacker@0.3.0/dist/homm3-unpacker.js"])
+
+         worker.onmessage = (e) => { tab.file = e.data }
+         worker.onerror = (e) => { tab.error = true }
+         worker.postMessage([type, buffer], [buffer])
       },
 
-      removeTab( tab ){
+      download(name, buffer) {
+         const a = document.createElement("a")
+         document.body.appendChild(a)
+         a.href = window.URL.createObjectURL(new Blob([buffer]))
+         a.download = name
+         a.click()
+         document.body.removeChild(a)
+      },
+
+      removeTab(tab) {
          const i = this.tabs.indexOf(tab)
          this.tabs.splice(i, 1)
 
-         if( tab === this.activeTab )
+         if (tab === this.activeTab)
             this.openTab(this.tabs[i] || this.tabs[i - 1] || null)
-         else
-            this.scrollToTab()
-      }, 
+      },
 
-      onDrop( event ){
-         this.dragCounter = 0
-
-         const files = event.dataTransfer.files
-         for( const file of files ){
+      openFiles(files) {
+         for (const file of files) {
             const reader = new FileReader()
             reader.onload = (e) => this.addTab(file.name, e.target.result)
             reader.readAsArrayBuffer(file)
          }
+      },
+
+      selectFiles() {
+         this.$refs["file-upload"].click()
+      },
+
+      onSelectFiles(event) {
+         this.openFiles(event.target.files)
+         event.target.value = null
+      },
+
+      onDrop(event) {
+         this.openFiles(event.dataTransfer.files)
+         this.dragCounter = 0
+      },
+
+      createWorker(onmessage, scripts) {
+         const parts = []
+         if (scripts)
+            parts.push("self.importScripts(" + scripts.map((s) => `"${s}"`).join(", ") + ")\n")
+         parts.push("self.onmessage = " + onmessage.toString())
+         return new Worker(URL.createObjectURL(new Blob(parts, { type: 'text/javascript' })))
       }
-
-   },
-
-   mounted(){
-      window.addEventListener("resize", this.scrollToTab)
-      document.addEventListener("drop", e => e.preventDefault())
    }
-
 })
 
-})
-
-</script>
-
+      })
+   </script>
 
 </body>
 </html>
