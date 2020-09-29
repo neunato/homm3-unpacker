@@ -204,20 +204,23 @@ for (const source of sources) {
          })
 
          it("{ palette: () => {} }", () => {
-            let paletteProcessor = (colors) => {
-               colors[2] = {r: 10, g: 20, b: 30, a: 40}
-               colors[10] = {r: 10, g: 20, b: 30, a: 40}
-               colors[255] = {r: 10, g: 20, b: 30, a: 40}
-               return colors
-            }
-            const def = unpackDEF(files["Cmummy.def"], { format: "bitmap", padding: false, palette: paletteProcessor })
+            const def = unpackDEF(files["Cmummy.def"], {
+               format: "bitmap",
+               padding: false,
+               palette: (colors) => {
+                  colors[2] = {r: 10, g: 20, b: 30, a: 40}
+                  colors[10] = {r: 10, g: 20, b: 30, a: 40}
+                  colors[255] = {r: 10, g: 20, b: 30, a: 40}
+                  return colors
+               }
+            })
 
-            assert(def.palette[0],   {r: 0,  g: 0,  b: 0,  a: 0  })  // original
-            assert(def.palette[1],   {r: 0,  g: 0,  b: 0,  a: 64 })  // original
-            assert(def.palette[2],   {r: 10, g: 20, b: 30, a: 40 })  // overwritten
-            assert(def.palette[10],  {r: 10, g: 20, b: 30, a: 40 })  // overwritten
-            assert(def.palette[254], {r: 21, g: 7,  b: 7,  a: 255})  // original
-            assert(def.palette[255], {r: 10, g: 20, b: 30, a: 40 })  // overwritten
+            assert(def.palette[0], {r: 0, g: 0, b: 0, a: 0})        // Original
+            assert(def.palette[1], {r: 0, g: 0, b: 0, a: 64})       // Original
+            assert(def.palette[2], {r: 10, g: 20, b: 30, a: 40})    // Overwritten
+            assert(def.palette[10], {r: 10, g: 20, b: 30, a: 40})   // Overwritten
+            assert(def.palette[254], {r: 21, g: 7, b: 7, a: 255})   // Original
+            assert(def.palette[255], {r: 10, g: 20, b: 30, a: 40})  // Overwritten
          })
 
          // For now all special colors except for unit selection and shadows in `def (creature)` defs are ignored.

@@ -1,5 +1,8 @@
 ﻿{
    "extends": "plugin:so-jah-seh/all",
+   "parserOptions": {
+      "sourceType": "script"
+   },
    "rules": {
       "no-bitwise": 0
    }
