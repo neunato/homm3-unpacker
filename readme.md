@@ -87,6 +87,9 @@ __`options.format`__ &raquo; format to encode image data to - `"png"`/`"bitmap"`
 
 __`options.padding`__ &raquo; include padding around images - boolean - defaults to `false`.
 
+__`options.palette(colors)`__ &raquo; function to process the file's color palette - function - defaults to `(colors) => colors`.
+
+
 ```javascript
 unpackDEF(file, { format: "png", padding: true })
 // {
