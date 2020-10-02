@@ -87,7 +87,7 @@ __`options.format`__ &raquo; format to encode image data to - `"png"`/`"bitmap"`
 
 __`options.padding`__ &raquo; include padding around images - boolean - defaults to `false`.
 
-__`options.palette(colors)`__ &raquo; function to process the file's color palette - function - defaults to `(colors) => colors`.
+__`options.palette(colours)`__ &raquo; function to process the file's colour palette - function - defaults to `(colours) => colours`.
 
 
 ```javascript
@@ -96,7 +96,7 @@ unpackDEF(file, { format: "png", padding: true })
 //    type: "def (creature)",
 //    fullWidth: 450,
 //    fullHeight: 400,
-//    palette: [                             // 256 rgba colors.
+//    palette: [                             // 256 rgba colours.
 //       { r: 0, g: 0, b: 0, a: 0 },
 //       { r: 0, g: 0, b: 0, a: 64 },
 //       { r: 255, g: 100, b: 255, a: 0 },
@@ -136,6 +136,8 @@ Parse .PCX images.
 __`buffer`__ &raquo; binary data of a file - `ArrayBuffer`/node.js `Buffer`.
 
 __`options.format`__ &raquo; format to encode image data to - `"png"`/`"bitmap"` - defaults to `"png"`.
+
+__`options.transparency`__ &raquo; array of colours to make transparent when they are the first colour in palette - defaults to `[{r:0,g:255,b:255}, {r:255,g:0,b:255}, {r:0,g:0,b:0}]`.
 
 ```javascript
 unpackPCX(file, { format: "png" })

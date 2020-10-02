@@ -11,20 +11,24 @@ const { deepStrictEqual } = require("assert")
 const files = {}
 
 const hashes = {
-   "H3ab_spr.lod": "d1caa924f479ecaa428a4372251ab09993ad48576d9ea5f21da6f17df0c74ed2",
-   "AH16_.DEF":    "83fb8b1101f81853408bbd26b93449fafa04b31f9e90e01773c27713a59337c8",
-   "AH16_.msk":    "e702a1b9c463f2fef2349a19984d27c8107d1638658183c4e591fa0bf9112382",
-   "Cmummy.def":   "de1d4367c68838d79a7331ccbaca086cd3aa3ae409bba054ee7f992d282e0f55",
+   "H3ab_spr.lod":     "d1caa924f479ecaa428a4372251ab09993ad48576d9ea5f21da6f17df0c74ed2",
+   "AH16_.DEF":        "83fb8b1101f81853408bbd26b93449fafa04b31f9e90e01773c27713a59337c8",
+   "AH16_.msk":        "e702a1b9c463f2fef2349a19984d27c8107d1638658183c4e591fa0bf9112382",
+   "Cmummy.def":       "de1d4367c68838d79a7331ccbaca086cd3aa3ae409bba054ee7f992d282e0f55",
 
-   "H3sprite.lod": "57caf2c50573f33a0d91e4222e51d3a73c136d44decf59dde21cacad88fe5d66",
-   "ArtifBon.def": "0739c23c1ee600e3ef12a9661c7dc46d607979f502a282e578f9cd7b93ffdd6f",
-   "AVCvgarm.def": "824f012514ab7f9fff7c6f418f14b90ff70ef86373955af0d02be7525604f02b",
-   "CRDRGN.def":   "434cf98ef1981b476dac398da0f2ff1f468fcb5e2a81c66896b0a9f4e0e21fff",
-   "SGTWMTA.def":  "ebf06379918753b4436bf9b84e85f18432cb089f1eeae3736e0e54769138b1ea",
-   "SGTWMTB.def":  "c3256609ec1f611e83f7d1d5832a394a135aaa8676a083037db3657268c9db6d",
+   "H3sprite.lod":     "57caf2c50573f33a0d91e4222e51d3a73c136d44decf59dde21cacad88fe5d66",
+   "ArtifBon.def":     "0739c23c1ee600e3ef12a9661c7dc46d607979f502a282e578f9cd7b93ffdd6f",
+   "AVCvgarm.def":     "824f012514ab7f9fff7c6f418f14b90ff70ef86373955af0d02be7525604f02b",
+   "CRDRGN.def":       "434cf98ef1981b476dac398da0f2ff1f468fcb5e2a81c66896b0a9f4e0e21fff",
+   "SGTWMTA.def":      "ebf06379918753b4436bf9b84e85f18432cb089f1eeae3736e0e54769138b1ea",
+   "SGTWMTB.def":      "c3256609ec1f611e83f7d1d5832a394a135aaa8676a083037db3657268c9db6d",
 
-   "BoArt120.pcx": "8f8d0b330ae12cfdb1f7b581cf0d1d239828bfef626ce3f4df0e9746e1a1c3cd",
-   "CslReE3c.pcx": "d99fc077dc70e7173b08fc59291486ce86f19fee50116847a00f097bc4b6df22"
+   "BoArt120.pcx":     "8f8d0b330ae12cfdb1f7b581cf0d1d239828bfef626ce3f4df0e9746e1a1c3cd",
+   "CslReE3c.pcx":     "d99fc077dc70e7173b08fc59291486ce86f19fee50116847a00f097bc4b6df22",
+   "t-bcw-001122.pcx": "2f667c33fee1887c331e80d0a0bb1baf731b68d25eefa1e1d32ef54e2967a0c3",
+   "t-ccw-001122.pcx": "b6f49e059b78d98ab30b42159b63eeedb232859eb4f6070f991a08fd9efa7723",
+   "t-mcw-001122.pcx": "649db28c94322872eda8a5fdb8fbdaf342145e9a2156dfab786c5ac399b9e939",
+   "t-wcw-001122.pcx": "fa78d5db57c126e1e9a7ee9d7529e5922d37a18afa7c408b31e7a9e627162182"
 }
 
 
@@ -391,6 +395,54 @@ for (const source of sources) {
             })
          })
 
+         it("{ transparency: [...] }", () => {
+            let pcx
+
+            let black = {r: 0, g: 0, b: 0, a: 255}
+            let white = {r: 255, g: 255, b: 255, a: 255}
+            let cyan = {r: 0, g: 255, b: 255, a: 255}
+            let magenta = {r: 255, g: 0, b: 255, a: 255}
+            let trans = {r: 0, g: 0, b: 0, a: 0}
+
+            // Keep raw colours.
+            pcx = unpackPCX(files["t-ccw-001122.pcx"], { format: "bitmap", transparency: [] })
+            assert(rgbArray(pcx.data), [cyan, cyan, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-mcw-001122.pcx"], { format: "bitmap", transparency: [] })
+            assert(rgbArray(pcx.data), [magenta, magenta, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-bcw-001122.pcx"], { format: "bitmap", transparency: [] })
+            assert(rgbArray(pcx.data), [black, black, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-wcw-001122.pcx"], { format: "bitmap", transparency: [] })
+            assert(rgbArray(pcx.data), [white, white, cyan, cyan, white, white])
+
+
+            // Defaults.
+            pcx = unpackPCX(files["t-ccw-001122.pcx"], { format: "bitmap" })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-mcw-001122.pcx"], { format: "bitmap" })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-bcw-001122.pcx"], { format: "bitmap" })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-wcw-001122.pcx"], { format: "bitmap" })
+            assert(rgbArray(pcx.data), [white, white, cyan, cyan, white, white])
+
+
+            // Custom transparency colours.
+            pcx = unpackPCX(files["t-ccw-001122.pcx"], { format: "bitmap", transparency: [cyan] })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-ccw-001122.pcx"], { format: "bitmap", transparency: [black, white, magenta, cyan] })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+
+            pcx = unpackPCX(files["t-wcw-001122.pcx"], { format: "bitmap", transparency: [white] })
+            assert(rgbArray(pcx.data), [trans, trans, cyan, cyan, white, white])
+         })
+
       })
    })
 }
@@ -428,6 +480,16 @@ function hashArrayBuffers(object) {
          hashArrayBuffers(object[key])
    }
 
+}
+
+
+// Convert an ArrayBuffer of [r,g,b,a,r,g,b,a...] to [{r,g,b,a}...].
+function rgbArray(buffer) {
+   let colours = []
+   let values = new Uint8Array(buffer)
+   for (let i = 0; i < values.length; i += 4)
+      colours.push({ r: values[i], g: values[i + 1], b: values[i + 2], a: values[i + 3] })
+   return colours
 }
 
 
