@@ -22,6 +22,7 @@ const hashes = {
    "CRDRGN.def":       "434cf98ef1981b476dac398da0f2ff1f468fcb5e2a81c66896b0a9f4e0e21fff",
    "SGTWMTA.def":      "ebf06379918753b4436bf9b84e85f18432cb089f1eeae3736e0e54769138b1ea",
    "SGTWMTB.def":      "c3256609ec1f611e83f7d1d5832a394a135aaa8676a083037db3657268c9db6d",
+   "cbehol.def":       "b525298ad566dcefa829a45542d4979af7c08a278beac8944ee36fa121f1ff44",
 
    "BoArt120.pcx":     "8f8d0b330ae12cfdb1f7b581cf0d1d239828bfef626ce3f4df0e9746e1a1c3cd",
    "CslReE3c.pcx":     "d99fc077dc70e7173b08fc59291486ce86f19fee50116847a00f097bc4b6df22",
@@ -228,7 +229,7 @@ for (const source of sources) {
          })
 
          // For now all special colors except for unit selection and shadows in `def (creature)` defs are ignored.
-         it("no special colors", () => {
+         it("special colors", () => {
             let def
 
             // Artifact, colors are not special, some happen to use yellow.
@@ -286,6 +287,21 @@ for (const source of sources) {
                y: 164,
                data: "b6ae6d87b96c9ace062fe66cad91e37c5ea8e90a9790acd81ad2adb3eddb047a",
                selection: "e8fa6712e970c0b9538465bdedf81d60a74500a59e74cace03a87fa1e6251f36"
+            })
+
+
+            // Creature DEF, selection must not be skipped if same frame is parsed for non-selection groups before
+            def = unpackDEF(files["cbehol.def"], { format: "png", padding: false })
+            hashArrayBuffers(def)
+            assert(def.type, "def (creature)")
+            assert(Object.keys(def.groups).slice(0, 3), ["moving", "mouse over", "standing"])     // Non-selection group parsed before selection group
+            assert(def.images["cbehol31.pcx"], {
+               width: 41,
+               height: 86,
+               x: 175,
+               y: 180,
+               data: "115979e030e0b6a91f9749f005e8c9160c017b8a2ad33b6375556ec376e55a8f",
+               selection: "c557b0ac5fe0271862233b88678549eacbdb87c6597641f5dae96b1260374f2e"
             })
          })
 
