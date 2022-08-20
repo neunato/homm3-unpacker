@@ -157,26 +157,26 @@ _Note: not to be confused with PCX images in DEFs._
 Reading/writing to files with the help of these two.
 
 ```javascript
-const fs = require("graceful-fs")                     // So we don't care about the number of open files.
+const fs = require("graceful-fs")        // So we don't care about the number of open files.
 
 function read(path) {
    return new Promise((resolve, reject) => {
       fs.readFile(path, (error, data) => (error ? reject(error) : resolve(data)))
-   }
+   })
 }
 
 function write(path, buffer) {
    return new Promise((resolve, reject) => {
       fs.writeFile(path, Buffer.from(buffer), (error) => (error ? reject(error) : resolve()))
-   }
+   })
 }
 ```
 
 ----------
 
-Unpack all files from a LOD and keep them in memory.
+Extract all files from a LOD and keep them in memory.
 
-Without a second parameter, the extracted files are stored as binary data in the `.files` dictionary object under their filenames.
+Without a second parameter, the extracted files are stored as binary data in the `.files` dictionary object, under their respective filenames.
 
 ```javascript
 async function example1(path) {
@@ -188,7 +188,7 @@ async function example1(path) {
 
 Previous example is equivalent to the following when a processor function is supplied as the second parameter.
 
-The callback is invoked with `(buffer, filename)` for every file and its return value stored under the value in `.files` dictionary.
+The callback is invoked with `(buffer, filename)` for every file and its return value stored in `.files` dictionary.
 
 ```javascript
 async function example2(path) {
@@ -200,7 +200,7 @@ async function example2(path) {
 
 When passing an object as the second parameter, its keys are matched against the file extension (case insensitively), and the callback's return value is stored instead of raw binary data.
 
-The following will parse all DEF files with `unpackDEF` and store any other file as `ArrayBuffer`.
+To parse all DEF files with `unpackDEF` and store any other file as `ArrayBuffer`:
 
 ```javascript
 async function example3(path) {
@@ -218,7 +218,7 @@ async function example4(path) {
 ```
 ----------
 
-Unpacking images from large LODs can take several minutes. It'd be nice to get some feedback while running - the following logs the completion of each parsed DEF.
+Unpacking images from large LODs can take several minutes, it'd be nice to get some feedback while running. Let's log the completion of each parsed DEF:
 
 ```javascript
 async function example5(path) {
@@ -262,7 +262,7 @@ async function example8(path) {
    const lod = unpackLOD(file, {
       def: (buffer, filename) {
          const def = unpackDEF(buffer, { format: "png", padding: true })
-         for (const [filename, image] of Object.entries(lod.files)) {
+         for (const [filename, image] of Object.entries(def.images)) {
             write(filename, image.data)
             if (image.selection)
                write(filename, image.selection)
